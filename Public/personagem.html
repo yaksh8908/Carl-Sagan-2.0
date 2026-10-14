@@ -1,0 +1,963 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carl Sagan — Three.js</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #050816;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .title {
+            position: fixed;
+            top: 25px;
+            left: 30px;
+            color: white;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 2px;
+        }
+
+        .title p {
+            margin-top: 6px;
+            opacity: .65;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="title">
+    <h1>CARL SAGAN</h1>
+    <p>Astrônomo • Cientista • Divulgador científico</p>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+    }
+}
+</script>
+
+<script type="module">
+
+import * as THREE from 'three';
+
+
+// ============================================================
+// CENA
+// ============================================================
+
+const scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0x030712);
+
+scene.fog = new THREE.FogExp2(
+    0x030712,
+    0.025
+);
+
+
+// ============================================================
+// CÂMERA
+// ============================================================
+
+const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+);
+
+camera.position.set(
+    0,
+    1.5,
+    7
+);
+
+camera.lookAt(
+    0,
+    1.1,
+    0
+);
+
+
+// ============================================================
+// RENDERER
+// ============================================================
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true
+});
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
+
+renderer.shadowMap.enabled = true;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
+
+renderer.toneMapping =
+    THREE.ACESFilmicToneMapping;
+
+renderer.toneMappingExposure = 1.1;
+
+document.body.appendChild(
+    renderer.domElement
+);
+
+
+// ============================================================
+// ILUMINAÇÃO
+// ============================================================
+
+const ambient = new THREE.AmbientLight(
+    0xffffff,
+    1.2
+);
+
+scene.add(ambient);
+
+
+const keyLight = new THREE.DirectionalLight(
+    0xffffff,
+    3
+);
+
+keyLight.position.set(
+    4,
+    6,
+    6
+);
+
+keyLight.castShadow = true;
+
+scene.add(keyLight);
+
+
+const blueLight = new THREE.PointLight(
+    0x3b82f6,
+    18,
+    15
+);
+
+blueLight.position.set(
+    -4,
+    2,
+    3
+);
+
+scene.add(blueLight);
+
+
+const warmLight = new THREE.PointLight(
+    0xffb36b,
+    8,
+    12
+);
+
+warmLight.position.set(
+    4,
+    1,
+    2
+);
+
+scene.add(warmLight);
+
+
+// ============================================================
+// MATERIAIS
+// ============================================================
+
+const skinMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0xc58f70,
+        roughness: 0.65
+    });
+
+
+const hairMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x5a3829,
+        roughness: 0.85
+    });
+
+
+const suitMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x171923,
+        roughness: 0.55
+    });
+
+
+const shirtMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0xd8d8d8,
+        roughness: 0.8
+    });
+
+
+const glassMaterial =
+    new THREE.MeshPhysicalMaterial({
+        color: 0x9edcff,
+        transmission: 0.35,
+        transparent: true,
+        opacity: 0.5,
+        roughness: 0.05
+    });
+
+
+const blackMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x080808,
+        roughness: 0.3
+    });
+
+
+// ============================================================
+// PERSONAGEM
+// ============================================================
+
+const character =
+    new THREE.Group();
+
+scene.add(character);
+
+
+// ============================================================
+// PESCOÇO
+// ============================================================
+
+const neck =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            0.16,
+            0.18,
+            0.25,
+            32
+        ),
+        skinMaterial
+    );
+
+neck.position.y = 1.55;
+
+character.add(neck);
+
+
+// ============================================================
+// CABEÇA
+// ============================================================
+
+const head =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            0.43,
+            48,
+            48
+        ),
+        skinMaterial
+    );
+
+head.scale.set(
+    0.9,
+    1.12,
+    0.92
+);
+
+head.position.y = 2.02;
+
+head.castShadow = true;
+
+character.add(head);
+
+
+// ============================================================
+// ORELHAS
+// ============================================================
+
+function createEar(x) {
+
+    const ear =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                0.12,
+                24,
+                24
+            ),
+            skinMaterial
+        );
+
+    ear.scale.set(
+        0.5,
+        1,
+        0.75
+    );
+
+    ear.position.set(
+        x,
+        2.02,
+        0
+    );
+
+    character.add(ear);
+}
+
+createEar(-0.39);
+createEar(0.39);
+
+
+// ============================================================
+// CABELO
+// ============================================================
+
+const hair =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            0.45,
+            40,
+            30
+        ),
+        hairMaterial
+    );
+
+hair.scale.set(
+    0.95,
+    0.65,
+    0.95
+);
+
+hair.position.set(
+    0,
+    2.35,
+    -0.02
+);
+
+character.add(hair);
+
+
+// ============================================================
+// COSTELETAS / LATERAIS DO CABELO
+// ============================================================
+
+function createHairSide(x) {
+
+    const side =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                0.13,
+                20,
+                20
+            ),
+            hairMaterial
+        );
+
+    side.scale.set(
+        0.65,
+        1.8,
+        0.75
+    );
+
+    side.position.set(
+        x,
+        2.18,
+        0
+    );
+
+    character.add(side);
+}
+
+createHairSide(-0.38);
+createHairSide(0.38);
+
+
+// ============================================================
+// OLHOS
+// ============================================================
+
+function createEye(x) {
+
+    const eye =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                0.055,
+                20,
+                20
+            ),
+            new THREE.MeshStandardMaterial({
+                color: 0x403024,
+                roughness: 0.3
+            })
+        );
+
+    eye.position.set(
+        x,
+        2.07,
+        0.39
+    );
+
+    character.add(eye);
+}
+
+createEye(-0.16);
+createEye(0.16);
+
+
+// ============================================================
+// ÓCULOS — CARACTERÍSTICA MARCANTE
+// ============================================================
+
+function createGlassesFrame(x) {
+
+    const frame =
+        new THREE.Mesh(
+            new THREE.TorusGeometry(
+                0.13,
+                0.018,
+                12,
+                32
+            ),
+            blackMaterial
+        );
+
+    frame.scale.set(
+        1.15,
+        0.82,
+        1
+    );
+
+    frame.position.set(
+        x,
+        2.08,
+        0.405
+    );
+
+    character.add(frame);
+}
+
+createGlassesFrame(-0.16);
+createGlassesFrame(0.16);
+
+
+// Ponte dos óculos
+
+const bridge =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            0.12,
+            0.025,
+            0.025
+        ),
+        blackMaterial
+    );
+
+bridge.position.set(
+    0,
+    2.08,
+    0.405
+);
+
+character.add(bridge);
+
+
+// Hastes
+
+const glassesBar =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            0.65,
+            0.018,
+            0.018
+        ),
+        blackMaterial
+    );
+
+glassesBar.position.set(
+    0,
+    2.08,
+    0.38
+);
+
+character.add(glassesBar);
+
+
+// ============================================================
+// SOBRANCELHAS
+// ============================================================
+
+function createEyebrow(x) {
+
+    const eyebrow =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                0.14,
+                0.025,
+                0.025
+            ),
+            hairMaterial
+        );
+
+    eyebrow.rotation.z =
+        x < 0 ? -0.08 : 0.08;
+
+    eyebrow.position.set(
+        x,
+        2.22,
+        0.39
+    );
+
+    character.add(eyebrow);
+}
+
+createEyebrow(-0.16);
+createEyebrow(0.16);
+
+
+// ============================================================
+// NARIZ
+// ============================================================
+
+const nose =
+    new THREE.Mesh(
+        new THREE.ConeGeometry(
+            0.065,
+            0.20,
+            24
+        ),
+        skinMaterial
+    );
+
+nose.rotation.x =
+    Math.PI / 2;
+
+nose.position.set(
+    0,
+    1.99,
+    0.42
+);
+
+character.add(nose);
+
+
+// ============================================================
+// BOCA
+// ============================================================
+
+const mouth =
+    new THREE.Mesh(
+        new THREE.TorusGeometry(
+            0.075,
+            0.012,
+            8,
+            24,
+            Math.PI
+        ),
+        new THREE.MeshStandardMaterial({
+            color: 0x663b38
+        })
+    );
+
+mouth.rotation.x =
+    Math.PI / 2;
+
+mouth.position.set(
+    0,
+    1.83,
+    0.405
+);
+
+character.add(mouth);
+
+
+// ============================================================
+// CORPO / TORSO
+// ============================================================
+
+const torso =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            0.47,
+            0.55,
+            1.1,
+            32
+        ),
+        suitMaterial
+    );
+
+torso.position.y = 1.0;
+
+torso.castShadow = true;
+
+character.add(torso);
+
+
+// ============================================================
+// CAMISA
+// ============================================================
+
+const shirt =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            0.25,
+            0.27,
+            0.75,
+            32
+        ),
+        shirtMaterial
+    );
+
+shirt.position.set(
+    0,
+    1.05,
+    0.32
+);
+
+shirt.scale.z = 0.25;
+
+character.add(shirt);
+
+
+// ============================================================
+// GRAVATA
+// ============================================================
+
+const tie =
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            0.09,
+            0.55,
+            0.025
+        ),
+        blackMaterial
+    );
+
+tie.position.set(
+    0,
+    0.98,
+    0.39
+);
+
+character.add(tie);
+
+
+// ============================================================
+// BRAÇOS
+// ============================================================
+
+function createArm(x) {
+
+    const arm =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                0.13,
+                0.11,
+                1.0,
+                32
+            ),
+            suitMaterial
+        );
+
+    arm.position.set(
+        x,
+        1.02,
+        0
+    );
+
+    arm.rotation.z =
+        x < 0 ? 0.10 : -0.10;
+
+    arm.castShadow = true;
+
+    character.add(arm);
+
+    // mão
+
+    const hand =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                0.14,
+                24,
+                24
+            ),
+            skinMaterial
+        );
+
+    hand.position.set(
+        x * 1.05,
+        0.50,
+        0
+    );
+
+    character.add(hand);
+}
+
+createArm(-0.62);
+createArm(0.62);
+
+
+// ============================================================
+// CINTURA
+// ============================================================
+
+const waist =
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            0.43,
+            0.45,
+            0.25,
+            32
+        ),
+        suitMaterial
+    );
+
+waist.position.y =
+    0.42;
+
+character.add(waist);
+
+
+// ============================================================
+// PERNAS
+// ============================================================
+
+function createLeg(x) {
+
+    const leg =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                0.16,
+                0.14,
+                1.15,
+                32
+            ),
+            suitMaterial
+        );
+
+    leg.position.set(
+        x,
+        -0.18,
+        0
+    );
+
+    leg.castShadow = true;
+
+    character.add(leg);
+
+
+    // sapato
+
+    const shoe =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                0.30,
+                0.14,
+                0.48
+            ),
+            blackMaterial
+        );
+
+    shoe.position.set(
+        x,
+        -0.78,
+        0.10
+    );
+
+    character.add(shoe);
+}
+
+createLeg(-0.22);
+createLeg(0.22);
+
+
+// ============================================================
+// ESTRELAS AO FUNDO
+// ============================================================
+
+const starGeometry =
+    new THREE.BufferGeometry();
+
+const starCount = 1200;
+
+const positions =
+    new Float32Array(
+        starCount * 3
+    );
+
+for (
+    let i = 0;
+    i < starCount * 3;
+    i += 3
+) {
+
+    positions[i] =
+        (Math.random() - 0.5) * 40;
+
+    positions[i + 1] =
+        (Math.random() - 0.5) * 25;
+
+    positions[i + 2] =
+        (Math.random() - 0.5) * 25 - 5;
+}
+
+starGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(
+        positions,
+        3
+    )
+);
+
+const starMaterial =
+    new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.025,
+        transparent: true,
+        opacity: 0.8
+    });
+
+const stars =
+    new THREE.Points(
+        starGeometry,
+        starMaterial
+    );
+
+scene.add(stars);
+
+
+// ============================================================
+// PLANETA / ESFERA DECORATIVA
+// ============================================================
+
+const planet =
+    new THREE.Mesh(
+        new THREE.SphereGeometry(
+            1.8,
+            64,
+            64
+        ),
+        new THREE.MeshStandardMaterial({
+            color: 0x102d54,
+            roughness: 0.8,
+            metalness: 0.1
+        })
+    );
+
+planet.position.set(
+    -3.8,
+    -1.6,
+    -3
+);
+
+planet.scale.setScalar(1.2);
+
+scene.add(planet);
+
+
+// ============================================================
+// ANIMAÇÃO
+// ============================================================
+
+const clock =
+    new THREE.Clock();
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+    const time =
+        clock.getElapsedTime();
+
+
+    // Respiração suave
+
+    character.position.y =
+        Math.sin(time * 1.5) * 0.015;
+
+
+    // Movimento muito sutil
+
+    character.rotation.y =
+        Math.sin(time * 0.5) * 0.05;
+
+
+    // Estrelas girando lentamente
+
+    stars.rotation.y =
+        time * 0.008;
+
+
+    // Planeta
+
+    planet.rotation.y =
+        time * 0.08;
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+animate();
+
+
+// ============================================================
+// RESPONSIVIDADE
+// ============================================================
+
+window.addEventListener(
+    'resize',
+    () => {
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+    }
+);
+
+</script>
+
+</body>
+</html>
+```

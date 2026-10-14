@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Carl Sagan Cosmos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="react-3d-root"></div>
+
+    <img id="bg-image" src="frases-Carl-Sagan-capa.jpg" alt="Carl Sagan" aria-hidden="true">
+
+    <main class="container container-center">
+        <div class="glass-card">
+            <div class="form-section">
+                <h1>Acessar o Cosmos</h1>
+                <p class="subtitle">Identifique-se para conversar com Carl Sagan</p>
+
+                <form id="login-form" class="cosmic-form">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>Entrar</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <p class="switch-link">
+                        Não tem uma conta? <a href="index.html">Cadastre-se</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="text/babel">
+        const { useEffect, useRef } = React;
+
+        function CosmicCanvas3D() {
+            const canvasRef = useRef(null);
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                const count = 1000;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(count * 3);
+
+                for (let i = 0; i < count * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 15;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const material = new THREE.PointsMaterial({
+                    size: 0.03,
+                    color: 0xa3c8ff,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+
+                camera.position.z = 3.5;
+
+                let mouseX = 0;
+                let mouseY = 0;
+
+                const handleMouseMove = (e) => {
+                    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.7;
+                    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.7;
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+
+                let animationFrameId;
+                const animate = () => {
+                    animationFrameId = requestAnimationFrame(animate);
+                    particles.rotation.y += 0.001;
+                    particles.rotation.x += (mouseY - particles.rotation.x) * 0.05;
+                    particles.rotation.y += (mouseX - particles.rotation.y) * 0.05;
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                const handleResize = () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    cancelAnimationFrame(animationFrameId);
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('resize', handleResize);
+                    renderer.dispose();
+                };
+            }, []);
+
+            return <canvas id="canvas-3d" ref={canvasRef} />;
+        }
+
+        ReactDOM.createRoot(document.getElementById('react-3d-root')).render(<CosmicCanvas3D />);
+    </script>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    window.location.href = data.redirecionar || 'chat.html';
+                } else {
+                    alert(data.erro || 'E-mail ou senha incorretos.');
+                }
+            } catch (err) {
+                alert('Erro ao conectar com o servidor backend.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>COSMOS — Explorando o Universo com Carl Sagan</title>
+  <meta name="description"
+    content="Uma jornada interativa em 3D pelo Sistema Solar, inspirada na obra de divulgação científica de Carl Sagan.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+</head>
+
+<body>
+
+  <!-- ================= LOADING SCREEN ================= -->
+  <div id="loading-screen" aria-hidden="true">
+    <div class="loading-inner">
+      <span class="loading-logo">✦ COSMOS</span>
+      <p class="loading-text">INICIALIZANDO SISTEMA ESTELAR<span class="loading-dots">...</span></p>
+      <div class="loading-bar-track">
+        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEADER ================= -->
+  <header id="site-header">
+    <div class="header-inner">
+      <a href="#hero" class="logo">
+        <span class="logo-mark">✦</span>
+        <span class="logo-text">COSMOS
+          <small>Uma jornada pelo universo</small>
+        </span>
+      </a>
+      <button id="nav-toggle" class="nav-toggle" aria-label="Abrir menu de navegação" aria-expanded="false"
+        aria-controls="primary-nav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="primary-nav" aria-label="Navegação principal">
+        <a href="#hero">Explorar</a>
+        <a href="#sistema-solar">Sistema Solar</a>
+        <a href="#carl-sagan">Carl Sagan</a>
+        <a href="#chat">Chat</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ================= HERO / SISTEMA SOLAR 3D ================= -->
+    <section id="hero" aria-label="Sistema Solar interativo em 3D">
+      <canvas id="solar-canvas" aria-hidden="true"></canvas>
+
+      <div class="hero-heading">
+        <h1>Explore o Sistema Solar</h1>
+        <p>Arraste para girar, role para aproximar e toque em um planeta para conhecê-lo.</p>
+      </div>
+
+      <!-- Planet info card -->
+      <section class="planet-card" id="planet-card" aria-label="Informações do planeta selecionado" aria-live="polite">
+        <div class="planet-card-top">
+          <span class="planet-type" id="planet-type">ESTRELA</span>
+          <span class="planet-index" id="planet-index">1 / 9</span>
+        </div>
+        <h2 class="planet-name" id="planet-name">SOL</h2>
+        <dl class="planet-stats" id="planet-stats">
+          <div>
+            <dt>Diâmetro</dt>
+            <dd id="stat-diameter">1.392.700 km</dd>
+          </div>
+          <div>
+            <dt>Distância do Sol</dt>
+            <dd id="stat-distance">—</dd>
+          </div>
+          <div>
+            <dt>Duração do ano</dt>
+            <dd id="stat-year">—</dd>
+          </div>
+        </dl>
+        <p class="planet-curiosity">
+          <span class="curiosity-label">Reflexão cósmica</span>
+          <span id="planet-curiosity-text">Toda a luz que sustenta a vida na Terra nasce aqui, em reações que começaram
+            bilhões de anos antes de existir alguém para admirá-las.</span>
+        </p>
+      </section>
+
+      <!-- Planet navigation + indicator -->
+      <div class="planet-nav" aria-label="Navegação entre planetas">
+        <button id="btn-prev" class="nav-btn" aria-label="Planeta anterior">
+          <span aria-hidden="true">←</span> Anterior
+        </button>
+        <div class="planet-dots" id="planet-dots" role="tablist" aria-label="Selecionar planeta"></div>
+        <button id="btn-next" class="nav-btn" aria-label="Próximo planeta">
+          Próximo <span aria-hidden="true">→</span>
+        </button>
+      </div>
+
+      <a href="#pale-blue-dot" class="scroll-indicator">
+        <span>EXPLORE O COSMOS</span>
+        <span class="scroll-chevron" aria-hidden="true">⌄</span>
+      </a>
+    </section>
+
+    <!-- ================= PALE BLUE DOT ================= -->
+    <section class="story-section" id="pale-blue-dot" data-reveal>
+      <div class="story-grid">
+        <div class="story-text">
+          <p class="story-eyebrow">Um ponto azul na imensidão</p>
+          <h2>Olhe de novo para aquele ponto.</h2>
+          <p>É aqui. É a nossa casa. É nós. Nele, todos que você ama, todos que você conhece, todos de quem já ouviu
+            falar, cada ser humano que já existiu, viveram suas vidas.</p>
+          <p>A Terra é um palco muito pequeno em uma vasta arena cósmica. Pense nos rios de sangue derramados por
+            generais e imperadores para que, em glória e triunfo, pudessem se tornar os senhores momentâneos de uma
+            fração de um ponto.</p>
+          <p>Não há sugestão mais clara da tolice das vaidades humanas do que esta imagem distante do nosso minúsculo
+            mundo. Para mim, ela ressalta nossa responsabilidade de lidar de forma mais gentil uns com os outros, e de
+            preservar e estimar esse pálido ponto azul, o único lar que já conhecemos.</p>
+        </div>
+        <div class="story-visual" aria-hidden="true">
+          <div class="pale-dot-scene">
+            <div class="pale-dot-ray"></div>
+            <div class="pale-dot"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CARL SAGAN ================= -->
+    <section class="story-section" id="carl-sagan" data-reveal>
+      <p class="story-eyebrow">Carl Sagan</p>
+      <h2>O homem que ensinou a humanidade a olhar para as estrelas</h2>
+      <p class="section-lede">Astrônomo, astrofísico e um dos maiores divulgadores científicos do século XX. Sagan
+        tornou o cosmos acessível a milhões de pessoas, unindo rigor científico e poesia na forma de contar o universo.
+      </p>
+
+      <div class="sagan-roles">
+        <span>Astrônomo</span>
+        <span>Astrofísico</span>
+        <span>Divulgador científico</span>
+        <span>Autor</span>
+        <span>Criador de Cosmos</span>
+      </div>
+
+      <ol class="timeline" aria-label="Linha do tempo de Carl Sagan">
+        <li>
+          <span class="timeline-year">1934</span>
+          <span class="timeline-label">Nascimento, em Brooklyn, Nova York</span>
+        </li>
+        <li>
+          <span class="timeline-year">1960</span>
+          <span class="timeline-label">Pesquisas sobre atmosferas planetárias e possibilidade de vida em outros
+            mundos</span>
+        </li>
+        <li>
+          <span class="timeline-year">1980</span>
+          <span class="timeline-label">Estreia da série Cosmos: A Personal Voyage</span>
+        </li>
+        <li>
+          <span class="timeline-year">1990</span>
+          <span class="timeline-label">Pale Blue Dot: a fotografia da Terra vista a 6 bilhões de km</span>
+        </li>
+        <li>
+          <span class="timeline-year">1996</span>
+          <span class="timeline-label">Falecimento e o legado de uma ciência acessível a todos</span>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ================= ESCALA DO UNIVERSO ================= -->
+    <section class="story-section" id="escala-universo" data-reveal>
+      <p class="story-eyebrow">Escala do universo</p>
+      <h2>Cada zoom para fora é uma lição de humildade</h2>
+      <div class="scale-list" id="scale-list">
+        <div class="scale-item" data-reveal>
+          <span class="scale-name">Terra</span>
+          <span class="scale-desc">Um mundo rochoso de 12.742 km de diâmetro, o único que conhecemos com vida.</span>
+        </div>
+        <div class="scale-item" data-reveal>
+          <span class="scale-name">Sistema Solar</span>
+          <span class="scale-desc">O Sol e tudo o que gira em torno dele, numa região de trilhões de quilômetros.</span>
+        </div>
+        <div class="scale-item" data-reveal>
+          <span class="scale-name">Via Láctea</span>
+          <span class="scale-desc">Cerca de 100 a 400 bilhões de estrelas, e o nosso Sol é apenas uma delas.</span>
+        </div>
+        <div class="scale-item" data-reveal>
+          <span class="scale-name">Grupo Local</span>
+          <span class="scale-desc">Dezenas de galáxias vizinhas, incluindo Andrômeda, presas por gravidade mútua.</span>
+        </div>
+        <div class="scale-item" data-reveal>
+          <span class="scale-name">Universo observável</span>
+          <span class="scale-desc">Trilhões de galáxias, num raio de mais de 46 bilhões de anos-luz.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= EXPLORAÇÃO CÓSMICA ================= -->
+    <section class="story-section" id="exploracao" data-reveal>
+      <p class="story-eyebrow">Exploração cósmica</p>
+      <h2>Temas para continuar a jornada</h2>
+      <div class="explore-grid">
+        <article class="explore-card" tabindex="0">
+          <span class="explore-icon" aria-hidden="true">🪐</span>
+          <h3>Planetas</h3>
+          <p>Mundos rochosos e gigantes gasosos, cada um com sua própria história de formação.</p>
+        </article>
+        <article class="explore-card" tabindex="0">
+          <span class="explore-icon" aria-hidden="true">✦</span>
+          <h3>Galáxias</h3>
+          <p>Ilhas de bilhões de estrelas, poeira e gás, unidas pela gravidade através do vazio.</p>
+        </article>
+        <article class="explore-card" tabindex="0">
+          <span class="explore-icon" aria-hidden="true">⋆</span>
+          <h3>Estrelas</h3>
+          <p>Fornalhas nucleares que forjaram cada átomo de cálcio em seus ossos e ferro em seu sangue.</p>
+        </article>
+        <article class="explore-card" tabindex="0">
+          <span class="explore-icon" aria-hidden="true">◉</span>
+          <h3>Buracos negros</h3>
+          <p>Regiões onde a gravidade dobra o próprio espaço-tempo além do ponto de retorno.</p>
+        </article>
+        <article class="explore-card" tabindex="0">
+          <span class="explore-icon" aria-hidden="true">✧</span>
+          <h3>Vida no universo</h3>
+          <p>Se a vida surgiu aqui, o que isso sugere sobre as chances de existir em outro lugar?</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= FRASES CÓSMICAS ================= -->
+    <section class="story-section" id="frases" data-reveal>
+      <p class="story-eyebrow">Frases cósmicas</p>
+      <h2>Pensamentos para contemplar o universo</h2>
+      <div class="quotes-grid">
+        <blockquote class="quote-card">
+          <p>"Somos uma forma pela qual o cosmos pode conhecer a si mesmo."</p>
+          <cite>Carl Sagan — tradução livre</cite>
+        </blockquote>
+        <blockquote class="quote-card">
+          <p>"A ausência de evidência não é evidência de ausência."</p>
+          <cite>Carl Sagan — tradução livre</cite>
+        </blockquote>
+        <blockquote class="quote-card original">
+          <p>"Em algum lugar, algo incrível está esperando para ser conhecido."</p>
+          <cite>Reflexão cósmica</cite>
+        </blockquote>
+        <blockquote class="quote-card original">
+          <p>"Perguntar é o primeiro gesto de quem decide olhar para cima."</p>
+          <cite>Reflexão cósmica</cite>
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- ================= CHATBOT ================= -->
+    <!-- ================= CHATBOT ================= -->
+
+    <section id="chat" class="chat-section">
+
+      <!-- Foto de fundo do Carl Sagan -->
+
+      <div class="carl-background" aria-hidden="true">
+        <img src="imagens/frases-Carl-Sagan-capa.jpg" alt="">
+        <div class="carl-overlay"></div>
+      </div>
+
+      <!-- Chatbot -->
+
+      <div class="chatbot-wrapper">
+
+        <div class="chatbot-header">
+
+          <div class="bot-avatar">
+            <div class="avatar-glow"></div>
+            ✦
+          </div>
+
+          <div class="bot-identity">
+            <span class="bot-status">ONLINE</span>
+            <h3>Carl Sagan</h3>
+            <p>Explorador do Cosmos</p>
+          </div>
+
+          <div class="status-dot"></div>
+
+        </div>
+
+        <div id="chat-messages" class="chat-messages">
+
+          <div class="message bot-message">
+
+            <div class="message-avatar">
+              ✦
+            </div>
+
+            <div class="message-content">
+
+              <p>
+                Olá, viajante cósmico. Sou uma inteligência
+                inspirada pela curiosidade científica e pelo
+                espírito de exploração de Carl Sagan.
+              </p>
+
+              <p>
+                O que você gostaria de descobrir hoje?
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div id="chat-suggestions" class="chat-suggestions">
+
+          <button type="button">O que é o Universo?</button>
+
+          <button type="button">Existem outras civilizações?</button>
+
+          <button type="button">Por que exploramos o espaço?</button>
+
+        </div>
+
+        <form id="chat-form" class="chat-form">
+
+          <input id="chat-input" type="text" placeholder="Pergunte algo sobre o Cosmos..." autocomplete="off"
+            aria-label="Digite sua pergunta sobre o Cosmos">
+
+          <button id="chat-send" type="submit" aria-label="Enviar mensagem">
+            ↑
+          </button>
+
+        </form>
+      
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+  <footer class="site-footer">
+    <p>✦ COSMOS — uma experiência interativa inspirada na obra de Carl Sagan. Não afiliado à propriedade intelectual de
+      terceiros.</p>
+  </footer>
+
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

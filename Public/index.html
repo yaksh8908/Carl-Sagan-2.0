@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro — Carl Sagan Cosmos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="react-3d-root"></div>
+
+    <img id="bg-image" src="frases-Carl-Sagan-capa.jpg" alt="Carl Sagan" aria-hidden="true">
+
+    <main class="container container-center">
+        <div class="glass-card">
+            <div class="form-section">
+                <h1>Criar Conta</h1>
+                <p class="subtitle">Junte-se à exploração do Cosmos</p>
+
+                <form id="cadastro-form" class="cosmic-form">
+                    <div class="form-group">
+                        <label for="usuario">Nome completo</label>
+                        <input type="text" id="usuario" name="usuario" placeholder="Carl Sagan" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>Cadastrar</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <p class="switch-link">
+                        Já possui uma conta? <a href="login.html">Faça login</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script type="text/babel">
+        const { useEffect, useRef } = React;
+
+        function CosmicCanvas3D() {
+            const canvasRef = useRef(null);
+
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                const particleCount = 1200;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const colors = new Float32Array(particleCount * 3);
+
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * 16;
+                    positions[i + 1] = (Math.random() - 0.5) * 16;
+                    positions[i + 2] = (Math.random() - 0.5) * 16;
+
+                    colors[i] = 0.7 + Math.random() * 0.3;
+                    colors[i + 1] = 0.8 + Math.random() * 0.2;
+                    colors[i + 2] = 1.0;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 0.035,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: 0.75,
+                    blending: THREE.AdditiveBlending
+                });
+
+                const particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+
+                camera.position.z = 4;
+
+                let mouseX = 0;
+                let mouseY = 0;
+
+                const handleMouseMove = (event) => {
+                    mouseX = (event.clientX / window.innerWidth - 0.5) * 0.8;
+                    mouseY = (event.clientY / window.innerHeight - 0.5) * 0.8;
+                };
+
+                window.addEventListener('mousemove', handleMouseMove);
+
+                let animationFrameId;
+                const animate = () => {
+                    animationFrameId = requestAnimationFrame(animate);
+                    particles.rotation.y += 0.0008;
+                    particles.rotation.x += (mouseY - particles.rotation.x) * 0.04;
+                    particles.rotation.y += (mouseX - particles.rotation.y) * 0.04;
+                    renderer.render(scene, camera);
+                };
+                animate();
+
+                const handleResize = () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                };
+
+                window.addEventListener('resize', handleResize);
+
+                return () => {
+                    cancelAnimationFrame(animationFrameId);
+                    window.removeEventListener('mousemove', handleMouseMove);
+                    window.removeEventListener('resize', handleResize);
+                    renderer.dispose();
+                };
+            }, []);
+
+            return <canvas id="canvas-3d" ref={canvasRef} />;
+        }
+
+        ReactDOM.createRoot(document.getElementById('react-3d-root')).render(<CosmicCanvas3D />);
+    </script>
+
+    <script>
+        document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const usuario = document.getElementById('usuario').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/cadastro', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, email, senha })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Cadastro efetuado com sucesso! Redirecionando para o login...');
+                    window.location.href = data.redirecionar || 'login.html';
+                } else {
+                    alert(data.erro || 'Erro ao cadastrar');
+                }
+            } catch (err) {
+                alert('Erro ao conectar com o servidor backend.');
+            }
+        });
+    </script>
+</body>
+</html>
