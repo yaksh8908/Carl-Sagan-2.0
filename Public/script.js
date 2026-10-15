@@ -532,45 +532,28 @@ function setChatBusy(busy) {
   dom.chatInput.disabled = busy;
 }
 
-async function askCosmos(question) {
-
-  const response = await fetch("/api/chat", {
-    method: "POST",
-
+async function askCosmos() {
+  const response = await fetch('http://localhost:3000/chat', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json'
     },
-
     body: JSON.stringify({
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT
-        },
-
-        ...conversationHistory,
-
-        {
-          role: "user",
-          content: question
-        }
-      ]
+      messages: conversationHistory.slice(-20)
     })
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      data?.erro ||
-      `HTTP ${response.status}`
-    );
+    throw new Error(data?.erro || `Erro HTTP ${response.status}`);
   }
 
-  return (
-    data?.answer?.trim() ||
-    "O universo respondeu em silêncio."
-  );
+  if (typeof data.answer !== 'string' || !data.answer.trim()) {
+    throw new Error('A IA não retornou uma resposta válida.');
+  }
+
+  return data.answer.trim();
 }
 
 
@@ -593,9 +576,12 @@ async function sendMessage(text) {
     conversationHistory.push({ role: "assistant", content: answer });
   } catch (error) {
     typingEl.remove();
+
+    console.error('[ERRO CHATBOT]', error);
+
     appendMessage(
-      "bot",
-      "As estrelas parecem silenciosas neste momento. Tente novamente em alguns instantes.",
+      'bot',
+      `Não consegui me conectar ao observatório cósmico. ${error.message}`,
       { isError: true }
     );
   } finally {
