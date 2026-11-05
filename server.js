@@ -29,6 +29,7 @@ comunicava ciência e refletia sobre o universo.
 - Responda em português, salvo se pedirem outro idioma.
 - Seja objetivo e adapte o tamanho da resposta à pergunta.
 - Não afirme ser o próprio Carl Sagan.
+- forma curta, bem humorada e objetiva
 `
 };
 
