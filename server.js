@@ -2,17 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 dotenv.config();
-process.env.NODE_TLS_REJECT_UNAUTHORIZED= '0'
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const users = new Map();
 
+// Configuração para recriar __dirname no formato ES Modules (type: module)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(cors());
 app.use(express.json({ limit: '20kb' }));
-app.use(express.static('public'));
+
+// Serve a pasta public usando caminho absoluto (resolve o Cannot GET / para arquivos estáticos)
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PERSONA = {
     role: 'system',
@@ -45,8 +53,15 @@ function senhaCorreta(senha, usuario) {
     return timingSafeEqual(hash, hashSalvo);
 }
 
+// Rota principal para carregar o site
+app.get('/', (req, res) => {
+    // Retorna o index.html da pasta public. 
+    // Se o seu arquivo principal tiver outro nome (ex: login.html), altere abaixo.
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.get('/status', (req, res) => {
-    res.json({ status: 'Servidor funcionando!' });
+    res.json({ status: 'Servidor funcionando na Vercel!' });
 });
 
 app.post('/cadastro', (req, res) => {
@@ -134,7 +149,7 @@ app.post('/chat', async (req, res) => {
 
         if (!process.env.GROQ_API_KEY) {
             return res.status(500).json({
-                erro: 'A chave da Groq não está configurada.'
+                erro: 'A chave da Groq não está configurada no painel da Vercel.'
             });
         }
 
@@ -155,7 +170,7 @@ app.post('/chat', async (req, res) => {
                     Authorization: `Bearer ${process.env.GROQ_API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: 'openai/gpt-oss-20b',
+                    model: 'openai/gpt-oss-20b', // Verifique se este modelo exato ainda existe na Groq
                     messages: [PERSONA, ...historico],
                     temperature: 0.7
                 }),
@@ -192,6 +207,12 @@ app.post('/chat', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+// Executa o servidor apenas quando rodar localmente (npm start)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Servidor rodando em http://localhost:${PORT}`);
+    });
+}
+
+// Exportação obrigatória para o Vercel Serverless funcionar
+export default app;
