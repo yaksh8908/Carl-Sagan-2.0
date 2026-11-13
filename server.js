@@ -55,8 +55,6 @@ function senhaCorreta(senha, usuario) {
 
 // Rota principal para carregar o site
 app.get('/', (req, res) => {
-    // Retorna o index.html da pasta public. 
-    // Se o seu arquivo principal tiver outro nome (ex: login.html), altere abaixo.
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -170,7 +168,7 @@ app.post('/chat', async (req, res) => {
                     Authorization: `Bearer ${process.env.GROQ_API_KEY}`
                 },
                 body: JSON.stringify({
-                    model: 'openai/gpt-oss-20b', // Verifique se este modelo exato ainda existe na Groq
+                    model: 'llama3-70b-8192', // Modelo corrigido
                     messages: [PERSONA, ...historico],
                     temperature: 0.7
                 }),

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,16 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
+
 <body>
     <div id="react-3d-root"></div>
 
@@ -25,25 +29,35 @@
                 <h1>Criar Conta</h1>
                 <p class="subtitle">Junte-se à exploração do Cosmos</p>
 
+                <div class="form-group">
+                    <label for="apelido">Como prefere ser chamado?</label>
+                    <input type="text" id="apelido" name="apelido" placeholder="Seu apelido cósmico" required
+                        autocomplete="nickname">
+                </div>
+
                 <form id="cadastro-form" class="cosmic-form">
                     <div class="form-group">
                         <label for="usuario">Nome completo</label>
-                        <input type="text" id="usuario" name="usuario" placeholder="Carl Sagan" required autocomplete="name">
+                        <input type="text" id="usuario" name="usuario" placeholder="Carl Sagan" required
+                            autocomplete="name">
                     </div>
 
                     <div class="form-group">
                         <label for="email">E-mail</label>
-                        <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required
+                            autocomplete="email">
                     </div>
 
                     <div class="form-group">
                         <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                        <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required
+                            minlength="6" autocomplete="new-password">
                     </div>
 
                     <button type="submit" class="submit-btn">
                         <span>Cadastrar</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
                     </button>
@@ -145,17 +159,17 @@
     </script>
 
     <script>
-        document.getElementById('cadastro-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        document.getElementById('cadastro-form').addEventListener('submit', async (e) => {e.preventDefault();
             const usuario = document.getElementById('usuario').value;
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
+            const apelido = document.getElementById('apelido').value;
 
             try {
-                const response = await fetch('http://localhost:3000/cadastro', {
+                const response = await fetch('/cadastro', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuario, email, senha })
+                    body: JSON.stringify({ usuario, email, senha, apelido })
                 });
 
                 const data = await response.json();
@@ -171,4 +185,5 @@
         });
     </script>
 </body>
+
 </html>
