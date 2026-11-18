@@ -13,15 +13,12 @@ const PORT = process.env.PORT || 3000;
 const users = new Map();
 
 // Configuração para recriar __dirname no formato ES Modules (type: module)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json({ limit: '20kb' }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve a pasta public usando caminho absoluto (resolve o Cannot GET / para arquivos estáticos)
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 const PERSONA = {
     role: 'system',
@@ -54,10 +51,6 @@ function senhaCorreta(senha, usuario) {
     return timingSafeEqual(hash, hashSalvo);
 }
 
-// Rota principal para carregar o site
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 app.get('/status', (req, res) => {
     res.json({ status: 'Servidor funcionando na Vercel!' });
