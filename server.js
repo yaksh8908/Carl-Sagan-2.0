@@ -18,6 +18,7 @@ const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json({ limit: '20kb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve a pasta public usando caminho absoluto (resolve o Cannot GET / para arquivos estáticos)
 app.use(express.static(path.join(__dirname, 'public')));
