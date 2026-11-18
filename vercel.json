@@ -1,8 +1,14 @@
 {
+  "version": 2,
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
-    { "source": "/cadastro", "destination": "/server.js" },
-    { "source": "/login", "destination": "/server.js" },
-    { "source": "/chat", "destination": "/server.js" },
-    { "source": "/status", "destination": "/server.js" }
+    { "source": "/cadastro", "destination": "/api/index" },
+    { "source": "/login",    "destination": "/api/index" },
+    { "source": "/chat",     "destination": "/api/index" }
   ]
 }
