@@ -1,14 +1,16 @@
 {
   "version": 2,
+  "framework": null,
   "functions": {
-    "api/index.js": {
+    "server.js": {
       "memory": 1024,
       "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/cadastro", "destination": "/api/index" },
-    { "source": "/login",    "destination": "/api/index" },
-    { "source": "/chat",     "destination": "/api/index" }
+    { "source": "/cadastro", "destination": "/server.js" },
+    { "source": "/login",    "destination": "/server.js" },
+    { "source": "/chat",     "destination": "/server.js" },
+    { "source": "/health",   "destination": "/server.js" }
   ]
 }
